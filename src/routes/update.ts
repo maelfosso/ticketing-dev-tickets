@@ -22,7 +22,10 @@ router.put(
       .isFloat({ gt: 0 })
       .withMessage('Price must be provided and greater than 0')
   ],
+  validateRequest,
   async (req: Request, res: Response) => {
+    const { title, price } = req.body;
+
     const ticket = await Ticket.findById(req.params.id);
 
     if (!ticket) {
@@ -32,6 +35,12 @@ router.put(
     if (ticket.userId !== req.currentUser!.id) {
       throw new NotAuthorizedError();
     }
+
+    ticket.set({
+      title,
+      price
+    });
+    await ticket.save();
 
     res.send(ticket);
   }

@@ -66,5 +66,29 @@ it ('returns 400 if the user provides an invalid title or price', async () => {
 });
 
 it ('updates the ticket provided valid inputs', async () => {
+  const cookie = global.signin();
 
+  const response = await http
+    .post('/api/tickets')
+    .set('Cookie', cookie)
+    .send({
+      title: 'aslkdw',
+      price: 20
+    });
+
+  await http
+    .put(`/api/tickets/${response.body.id}`)
+    .set('Cookie', cookie)
+    .send({
+      title: 'new title',
+      price: 100
+    })
+    .expect(200);
+
+  const ticketResponse = await http
+    .get(`/api/tickets/${response.body.id}`)
+    .send();
+
+  expect(ticketResponse.body.title).toEqual('new title');
+  expect(ticketResponse.body.price).toEqual(100);
 });
